@@ -221,17 +221,29 @@ int snprint_n_strings(char *buf, size_t length, size_t n, const char *str)
     return (int)(n * str_len);
 }
 
+/* Returns number of raw bytes written to the buffer */
 FT_INTERNAL
-int new_snprint_n_strings(context_t *cntx, size_t length, size_t n, const char *str)
+int new_snprint_n_strings(context_t *cntx, size_t n, const char *str)
 {
-    char *buf = cntx->buf;
-    int wr = snprint_n_strings(buf, length, n, str);
-    cntx->width_written += wr;
-    cntx->raw_bytes_written += wr;
-    cntx->buf += wr;
-    assert(cntx->raw_bytes_written <= cntx->raw_bytes_available);
-    assert(cntx->width_written <= cntx->width_available);
+    size_t free_space = CNTX_FREE_RAW_SPACE(cntx);
+    size_t str_len = strlen(str);
 
+    if (free_space <= n * str_len)
+        return -1;
+
+    if (n == 0 || str_len == 0)
+        return 0;
+
+    /* To ensure valid return value it is safely not print such big strings */
+    if (n * str_len > INT_MAX)
+        return -1;
+
+    int wr = snprint_n_strings(CNTX_BUF_END(cntx), free_space, n, str);
+    if (wr < 0)
+        return wr;
+
+    CNTX_INC_BUF_END(cntx, wr, wr);
+    return wr;
 }
 
 

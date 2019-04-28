@@ -29,6 +29,7 @@ void test_strchr_count(void);
 void test_str_n_substring(void);
 void test_buffer_text_visible_width(void);
 void test_buffer_text_visible_height(void);
+void test_snprint_n_strings(void);
 
 
 void test_string_buffer(void)
@@ -37,6 +38,7 @@ void test_string_buffer(void)
     test_str_n_substring();
     test_buffer_text_visible_width();
     test_buffer_text_visible_height();
+    test_snprint_n_strings();
 }
 
 
@@ -540,4 +542,33 @@ void test_buffer_text_visible_height(void)
     buffer->type = CHAR_BUF;
     buffer->str.cstr = old_value;
     destroy_string_buffer(buffer);
+}
+
+
+void test_snprint_n_strings(void)
+{
+    context_t cntx;
+    char buffer[256];
+
+    INIT_CONTEXT(&cntx, buffer, 0, 1);
+    assert_true(new_snprint_n_strings(&cntx, 1, "abc") == -1);
+
+    INIT_CONTEXT(&cntx, buffer, 2, 3);
+    assert_true(new_snprint_n_strings(&cntx, 1, "abc") == -1);
+
+    INIT_CONTEXT(&cntx, buffer, 3, 4);
+    assert_true(new_snprint_n_strings(&cntx, 1, "abc") == 3);
+    assert_true(strcmp(cntx.buf, "abc") == 0);
+
+    INIT_CONTEXT(&cntx, buffer, 6, 7);
+    assert_true(new_snprint_n_strings(&cntx, 2, "abc") == 6);
+    assert_true(strcmp(cntx.buf, "abcabc") == 0);
+
+    INIT_CONTEXT(&cntx, buffer, 3, 4);
+    assert_true(new_snprint_n_strings(&cntx, 3, "\n") == 3);
+    assert_true(strcmp(cntx.buf, "\n\n\n") == 0);
+
+    INIT_CONTEXT(&cntx, buffer, 8, 9);
+    assert_true(new_snprint_n_strings(&cntx, 2, "abc\n") == 8);
+    assert_true(strcmp(cntx.buf, "abc\nabc\n") == 0);
 }

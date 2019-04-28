@@ -595,6 +595,9 @@ const char *ft_to_string(const ft_table_t *table)
                                 enum HorSeparatorPos, const separator_t *,
                                 const context_t *) = print_row_separator;
     int (*snprint_n_strings_)(char *, size_t, size_t, const char *) = snprint_n_strings;
+
+    int (*new_snprint_n_strings_)(context_t *, size_t, const char *) = new_snprint_n_strings;
+
     assert(table);
 
     /* Determing size of table string representation */
@@ -635,18 +638,26 @@ const char *ft_to_string(const ft_table_t *table)
     int tmp = 0;
     size_t i = 0;
     context_t context;
+    INIT_CONTEXT(&context, buffer, sz,
+                 string_buffer_raw_bytes_capacity(table->conv_buffer));
     context.table_properties = (table->properties ? table->properties : &g_table_properties);
-    INIT_CONTEXT(&context, sz, string_buffer_raw_bytes_capacity(table->conv_buffer));
 
     fort_row_t *prev_row = NULL;
     fort_row_t *cur_row = NULL;
     separator_t *cur_sep = NULL;
     size_t sep_size = vector_size(table->separators);
 
+//    /* Print top margin */
+//    for (i = 0; i < context.table_properties->entire_table_properties.top_margin; ++i) {
+//        CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, sz - written, width - 1/* minus new_line*/, space_char));
+//        CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, sz - written, 1, new_line_char));
+//    }
+
+
     /* Print top margin */
     for (i = 0; i < context.table_properties->entire_table_properties.top_margin; ++i) {
-        CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, sz - written, width - 1/* minus new_line*/, space_char));
-        CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, sz - written, 1, new_line_char));
+        CHCK_RSLT_ADD_TO_WRITTEN(new_snprint_n_strings_(&context, width - 1/* minus new_line*/, space_char));
+        CHCK_RSLT_ADD_TO_WRITTEN(new_snprint_n_strings_(&context, 1, new_line_char));
     }
 
     for (i = 0; i < rows; ++i) {

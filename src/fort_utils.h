@@ -117,17 +117,27 @@ struct fort_context {
     size_t column;
 
     char *buf;
-    size_t width_available_in_cntx;
+    size_t width_available;
     size_t width_written;
     size_t raw_bytes_available;
     size_t raw_bytes_written;
 };
-#define INIT_CONTEXT(cntx, buf, wid_avail, raw_bytes_avail) \
-    (cntx)->buf = (buf); \
+#define INIT_CONTEXT(cntx, buffer, wid_avail, raw_bytes_avail) \
+    (cntx)->buf = (buffer); \
     (cntx)->width_available = (wid_avail); \
     (cntx)->width_written = 0; \
     (cntx)->raw_bytes_available = (raw_bytes_avail); \
     (cntx)->raw_bytes_written = 0
+
+#define CNTX_BUF_END(cntx) \
+    ((cntx)->buf + (cntx)->raw_bytes_written)
+#define CNTX_INC_BUF_END(cntx_, width_written_, raw_written_) \
+    do { \
+        (cntx_)->width_written += (size_t)width_written_; \
+        (cntx_)->raw_bytes_written += (size_t)raw_written_; \
+    } while(0)
+#define CNTX_FREE_RAW_SPACE(cntx_) \
+    ((cntx_)->raw_bytes_available - (cntx_)->raw_bytes_written)
 
 typedef struct fort_context context_t;
 typedef struct fort_column_properties fort_column_properties_t;
@@ -179,7 +189,7 @@ FT_INTERNAL
 int snprint_n_strings(char *buf, size_t length, size_t n, const char *str);
 
 FT_INTERNAL
-int new_snprint_n_strings(context_t *cntx, size_t length, size_t n, const char *str);
+int new_snprint_n_strings(context_t *cntx, size_t n, const char *str);
 
 #if defined(FT_HAVE_WCHAR)
 FT_INTERNAL

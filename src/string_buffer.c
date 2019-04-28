@@ -289,7 +289,7 @@ string_buffer_t *create_string_buffer(size_t number_of_chars, enum str_buf_type 
 #endif /* FT_HAVE_WCHAR */
 #ifdef FT_HAVE_UTF8
     } else if (sz && type == UTF8_BUF) {
-        ((char*)result->str.u8str)[0] = '\0';
+        ((char *)result->str.u8str)[0] = '\0';
 #endif /* FT_HAVE_WCHAR */
     }
 

@@ -411,6 +411,191 @@ clear:
     return status;
 }
 
+//FT_INTERNAL
+//int new_print_row_separator(context_t *context,
+//                        const size_t *col_width_arr, size_t cols,
+//                        const fort_row_t *upper_row, const fort_row_t *lower_row,
+//                        enum HorSeparatorPos separatorPos, const separator_t *sep)
+//{
+//    int (*snprint_n_strings_)(char *, size_t, size_t, const char *) = snprint_n_strings;
+//    int (*new_snprint_n_strings_)(context_t *, size_t , const char *) = new_snprint_n_strings;
+
+////    assert(buffer);
+////    assert(context);
+
+//    const char *space_char = " ";
+//    int status = -1;
+
+//    /* Get cell types
+//     *
+//     * Regions above top row and below bottom row areconsidered full of virtual
+//     * GroupSlaveCell cells
+//     */
+//    enum CellType *top_row_types = (enum CellType *)F_MALLOC(sizeof(enum CellType) * cols * 2);
+//    if (top_row_types == NULL) {
+//        return FT_MEMORY_ERROR;
+//    }
+//    enum CellType *bottom_row_types = top_row_types + cols;
+//    if (upper_row) {
+//        get_row_cell_types(upper_row, top_row_types, cols);
+//    } else {
+//        size_t i = 0;
+//        for (i = 0; i < cols; ++i)
+//            top_row_types[i] = GroupSlaveCell;
+//    }
+//    if (lower_row) {
+//        get_row_cell_types(lower_row, bottom_row_types, cols);
+//    } else {
+//        size_t i = 0;
+//        for (i = 0; i < cols; ++i)
+//            bottom_row_types[i] = GroupSlaveCell;
+//    }
+
+
+//    size_t written = 0;
+//    int tmp = 0;
+
+//    enum ft_row_type lower_row_type = FT_ROW_COMMON;
+//    if (lower_row != NULL) {
+//        lower_row_type = (enum ft_row_type)get_cell_property_value_hierarcial(context->table_properties, context->row, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE);
+//    }
+//    enum ft_row_type upper_row_type = FT_ROW_COMMON;
+//    if (upper_row != NULL) {
+//        upper_row_type = (enum ft_row_type)get_cell_property_value_hierarcial(context->table_properties, context->row - 1, FT_ANY_COLUMN, FT_CPROP_ROW_TYPE);
+//    }
+
+//    /* Row separator anatomy
+//     *
+//     *  |      C11    |   C12         C13      |      C14           C15         |
+//     *  L  I  I  I   IV  I   I   IT  I  I  I  IB    I    I     II    I    I     R
+//     *  |      C21    |   C22     |   C23             C24           C25         |
+//    */
+//    const char **L = NULL;
+//    const char **I = NULL;
+//    const char **IV = NULL;
+//    const char **R = NULL;
+//    const char **IT = NULL;
+//    const char **IB = NULL;
+//    const char **II = NULL;
+
+
+//    typedef const char *(*border_chars_point_t)[BorderItemPosSize];
+//    const char *(*border_chars)[BorderItemPosSize] = NULL;
+//    border_chars = (border_chars_point_t)&context->table_properties->border_style.border_chars;
+//    if (upper_row_type == FT_ROW_HEADER || lower_row_type == FT_ROW_HEADER) {
+//        border_chars = (border_chars_point_t)&context->table_properties->border_style.header_border_chars;
+//    }
+
+//    if (sep && sep->enabled) {
+//        L = &(context->table_properties->border_style.separator_chars[LH_sip]);
+//        I = &(context->table_properties->border_style.separator_chars[IH_sip]);
+//        IV = &(context->table_properties->border_style.separator_chars[II_sip]);
+//        R = &(context->table_properties->border_style.separator_chars[RH_sip]);
+
+//        IT = &(context->table_properties->border_style.separator_chars[TI_sip]);
+//        IB = &(context->table_properties->border_style.separator_chars[BI_sip]);
+//        II = &(context->table_properties->border_style.separator_chars[IH_sip]);
+
+//        if (lower_row == NULL) {
+//            L = &(*border_chars)[BL_bip];
+//            R = &(*border_chars)[BR_bip];
+//        } else if (upper_row == NULL) {
+//            L = &(*border_chars)[TL_bip];
+//            R = &(*border_chars)[TR_bip];
+//        }
+//    } else {
+//        switch (separatorPos) {
+//            case TopSeparator:
+//                L = &(*border_chars)[TL_bip];
+//                I = &(*border_chars)[TT_bip];
+//                IV = &(*border_chars)[TV_bip];
+//                R = &(*border_chars)[TR_bip];
+
+//                IT = &(*border_chars)[TV_bip];
+//                IB = &(*border_chars)[TV_bip];
+//                II = &(*border_chars)[TT_bip];
+//                break;
+//            case InsideSeparator:
+//                L = &(*border_chars)[LH_bip];
+//                I = &(*border_chars)[IH_bip];
+//                IV = &(*border_chars)[II_bip];
+//                R = &(*border_chars)[RH_bip];
+
+//                /*
+//                IT = &(*border_chars)[TV_bip];
+//                IB = &(*border_chars)[BV_bip];
+//                */
+//                IT = &(*border_chars)[TI_bip];
+//                IB = &(*border_chars)[BI_bip];
+//                II = &(*border_chars)[IH_bip];
+//                break;
+//            case BottomSeparator:
+//                L = &(*border_chars)[BL_bip];
+//                I = &(*border_chars)[BB_bip];
+//                IV = &(*border_chars)[BV_bip];
+//                R = &(*border_chars)[BR_bip];
+
+//                IT = &(*border_chars)[BV_bip];
+//                IB = &(*border_chars)[BV_bip];
+//                II = &(*border_chars)[BB_bip];
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+
+//    size_t i = 0;
+
+//    /* If all chars are not printable, skip line separator */
+//    /* todo: add processing for wchar_t */
+//    /*
+//    if (!isprint(*L) && !isprint(*I) && !isprint(*IV) && !isprint(*R)) {
+//        status = 0;
+//        goto clear;
+//    }
+//    */
+//    if ((strlen(*L) == 0 || (strlen(*L) == 1 && !isprint(**L)))
+//        && (strlen(*I) == 0 || (strlen(*I) == 1 && !isprint(**I)))
+//        && (strlen(*IV) == 0 || (strlen(*IV) == 1 && !isprint(**IV)))
+//        && (strlen(*R) == 0 || (strlen(*R) == 1 && !isprint(**R)))) {
+//        status = 0;
+//        goto clear;
+//    }
+
+//    /* Print left margin */
+//    CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, context->table_properties->entire_table_properties.left_margin, space_char));
+//    CHCK_RSLT_ADD_TO_WRITTEN(new_snprint_n_strings_(&context, width - 1/* minus new_line*/, space_char));
+
+//    for (i = 0; i < cols; ++i) {
+//        if (i == 0) {
+//            CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *L));
+//        } else {
+//            if ((top_row_types[i] == CommonCell || top_row_types[i] == GroupMasterCell)
+//                && (bottom_row_types[i] == CommonCell || bottom_row_types[i] == GroupMasterCell)) {
+//                CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *IV));
+//            } else if (top_row_types[i] == GroupSlaveCell && bottom_row_types[i] == GroupSlaveCell) {
+//                CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *II));
+//            } else if (top_row_types[i] == GroupSlaveCell) {
+//                CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *IT));
+//            } else {
+//                CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *IB));
+//            }
+//        }
+//        CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, col_width_arr[i], *I));
+//    }
+//    CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, *R));
+
+//    /* Print right margin */
+//    CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, context->table_properties->entire_table_properties.right_margin, space_char));
+
+//    CHCK_RSLT_ADD_TO_WRITTEN(snprint_n_strings_(buffer + written, buffer_sz - written, 1, "\n"));
+
+//    status = (int)written;
+
+//clear:
+//    F_FREE(top_row_types);
+//    return status;
+//}
 
 #ifdef FT_HAVE_WCHAR
 FT_INTERNAL

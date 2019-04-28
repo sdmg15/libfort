@@ -57,6 +57,12 @@ int print_row_separator(char *buffer, size_t buffer_sz,
                         const context_t *context);
 
 FT_INTERNAL
+int new_print_row_separator(context_t *cntx,
+                            const size_t *col_width_arr, size_t cols,
+                            const fort_row_t *upper_row, const fort_row_t *lower_row,
+                            enum HorSeparatorPos separatorPos, const separator_t *sep);
+
+FT_INTERNAL
 int snprintf_row(const fort_row_t *row, char *buffer, size_t buf_sz, size_t *col_width_arr, size_t col_width_arr_sz,
                  size_t row_height, const context_t *context);
 
